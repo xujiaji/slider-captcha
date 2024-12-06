@@ -116,6 +116,7 @@
     _proto.init = function (data) {
         this.bgImage = data.bgImage;
         this.slideImage = data.slideImage;
+        this.y = data.y
 
         this.initDOM();
         this.initImg();
@@ -193,7 +194,7 @@
         var blockImage = new Image();
         blockImage.src = "data:image/png;base64," + this.slideImage;
         blockImage.onload = () => {
-            this.blockCtx.drawImage(blockImage, 0, 0);
+            this.blockCtx.drawImage(blockImage, 0, this.y);
             that.text.textContent = that.text.getAttribute('data-text');
         };
     };

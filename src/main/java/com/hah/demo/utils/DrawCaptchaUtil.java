@@ -1,6 +1,5 @@
 package com.hah.demo.utils;
 
-import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -86,7 +86,6 @@ public class DrawCaptchaUtil {
      */
     public static String getSlideImageBase64(File bgImageFile, File slideImagePath, int[] point, Integer canvasWidth, Integer canvasHeight) {
         Graphics2D bgg = null;
-        Graphics2D slg = null;
         Graphics2D g2 = null;
         InputStream inputStream = null;
         try {
@@ -98,10 +97,6 @@ public class DrawCaptchaUtil {
             BufferedImage read = ImageIO.read(inputStream);
             bgg.drawImage(read, 0, 0, canvasWidth, canvasHeight, null, null);
 
-            BufferedImage sliderImg = new BufferedImage(SLIDE_CANVAS_WIDTH, canvasHeight, BufferedImage.TYPE_INT_ARGB);
-            slg = sliderImg.createGraphics();
-            slg.getDeviceConfiguration().createCompatibleImage(SLIDE_CANVAS_WIDTH, canvasHeight, Transparency.TRANSLUCENT);
-            slg = sliderImg.createGraphics();
             BufferedImage slideImage = bgImg.getSubimage(point[0], point[1], SLIDE_IMAGE_WIDTH, SLIDE_IMAGE_HEIGHT);
             inputStream = Files.newInputStream(Paths.get(slideImagePath.getAbsolutePath()));
             BufferedImage slide = ImageIO.read(inputStream);
@@ -110,8 +105,7 @@ public class DrawCaptchaUtil {
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.85f));
 
             g2.drawImage(slideImage, 0, 0, null);
-            slg.drawImage(slide, 0, point[1], null);
-            return ImageToBase64Util.bufferedImageToBase64(sliderImg);
+            return ImageToBase64Util.bufferedImageToBase64(slide);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -125,13 +119,6 @@ public class DrawCaptchaUtil {
             try {
                 if (g2 != null) {
                     g2.dispose();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
-                if (null != slg) {
-                    slg.dispose();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -197,8 +184,7 @@ public class DrawCaptchaUtil {
                 out = new ByteArrayOutputStream();
                 ImageIO.write(image, "PNG", out);
                 byte[] bytes = out.toByteArray();
-                BASE64Encoder base64Encoder = new BASE64Encoder();
-                return base64Encoder.encodeBuffer(bytes);
+                return Base64.getEncoder().encodeToString(bytes);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
